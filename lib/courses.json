@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Graphql",
+    "teacher": "Pachis",
+    "description": "Aprender graphql",
+    "topic": "como usar de manera basica graphql"
+  },
+  {
+    "title": "React advace",
+    "teacher": "Ismael",
+    "description": "Aprender como hacer patrones de diseño para react",
+    "topic": "como usar react de manera avanzada"
+  },
+  {
+    "title": "Unit test with react",
+    "teacher": "Freddy cabeza de cubo",
+    "description": "Hacer pruebas unitarias para componentes de react",
+    "topic": "Jest, Enzyme etc"
+  }
+]
