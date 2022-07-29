@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { dbConnection } = require("./config");
 
 const getCourses = async () => {
@@ -12,7 +13,7 @@ const getCourses = async () => {
 
 const getCourseById = async (id) => {
   try {
-    const client = await connection();
+    const client = await dbConnection();
     const course = client
       .db("graphql")
       .collection("courses")
@@ -23,4 +24,31 @@ const getCourseById = async (id) => {
   }
 };
 
-module.exports = { getCourses, getCourseById };
+const getStudents = async () => {
+  try {
+    const client = await dbConnection();
+    const students = client
+      .db("graphql")
+      .collection("students")
+      .find()
+      .toArray();
+    return students;
+  } catch (error) {
+    console.error("[getStudentsError] ", error);
+  }
+};
+
+const getStudentById = async (id) => {
+  try {
+    const client = await dbConnection();
+    const student = client
+      .db("graphql")
+      .collection("students")
+      .findOne({ _id: ObjectId(id) });
+    return student;
+  } catch (error) {
+    console.error("[getStudentByIdError] ", error);
+  }
+};
+
+module.exports = { getCourses, getCourseById, getStudents, getStudentById };
