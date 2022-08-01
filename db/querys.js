@@ -1,4 +1,5 @@
 const { ObjectId } = require("mongodb");
+const { errorHandler } = require("../lib/errorHandler");
 const { dbConnection } = require("./config");
 
 const getCourses = async () => {
@@ -7,7 +8,7 @@ const getCourses = async () => {
     const courses = client.db("graphql").collection("courses").find().toArray();
     return courses || [];
   } catch (error) {
-    console.error("[getCoursesError] ", error);
+    errorHandler("getCoursesError", error);
   }
 };
 
@@ -20,11 +21,11 @@ const getCourseById = async (id) => {
       .findOne({ _id: ObjectId(id) });
     return course;
   } catch (error) {
-    console.error("[getCourseByIdError] ", error);
+    errorHandler("getCourseByIdError", error);
   }
 };
 
-const getStudents = async () => {
+const getPeople = async () => {
   try {
     const client = await dbConnection();
     const students = client
@@ -34,11 +35,11 @@ const getStudents = async () => {
       .toArray();
     return students;
   } catch (error) {
-    console.error("[getStudentsError] ", error);
+    errorHandler("getStudentsError", error);
   }
 };
 
-const getStudentById = async (id) => {
+const getpersonById = async (id) => {
   try {
     const client = await dbConnection();
     const student = client
@@ -47,8 +48,8 @@ const getStudentById = async (id) => {
       .findOne({ _id: ObjectId(id) });
     return student;
   } catch (error) {
-    console.error("[getStudentByIdError] ", error);
+    errorHandler("getStudentByIdError", error);
   }
 };
 
-module.exports = { getCourses, getCourseById, getStudents, getStudentById };
+module.exports = { getCourses, getCourseById, getPeople, getpersonById };

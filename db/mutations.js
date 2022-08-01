@@ -1,4 +1,5 @@
 const { ObjectId } = require("mongodb");
+const { errorHandler } = require("../lib/errorHandler");
 const { dbConnection } = require("./config");
 
 const createCourse = async (input) => {
@@ -23,11 +24,11 @@ const createCourse = async (input) => {
     newCourse._id = course.insertedId;
     return newCourse;
   } catch (error) {
-    console.error("[createCourseError] ", error);
+    errorHandler("createCourseError", error);
   }
 };
 
-const createStudent = async (inputs) => {
+const createPerson = async (inputs) => {
   try {
     const client = await dbConnection();
     const student = await client
@@ -40,7 +41,7 @@ const createStudent = async (inputs) => {
     };
     return newStundet;
   } catch (error) {
-    console.error("[createStudentError] ", error);
+    errorHandler("createStudentError", error);
   }
 };
 
@@ -57,11 +58,11 @@ const editCourse = async (inputs, _id) => {
       .findOne({ _id: ObjectId(_id) });
     return course;
   } catch (error) {
-    console.error("[editCourseError] ", error);
+    errorHandler("editCourseError", error);
   }
 };
 
-const editStudent = async (inputs, _id) => {
+const editPerson = async (inputs, _id) => {
   try {
     const client = await dbConnection();
     await client
@@ -74,8 +75,83 @@ const editStudent = async (inputs, _id) => {
       .findOne({ _id: ObjectId(_id) });
     return student;
   } catch (error) {
-    console.error("[editStudentError] ", error);
+    errorHandler("editStudentError", error);
   }
 };
 
-module.exports = { createCourse, createStudent, editCourse, editStudent };
+const deleteCourse = async (_id) => {
+  try {
+    const client = await dbConnection();
+    const findCourseToDelete = await client
+      .db("graphql")
+      .collection("courses")
+      .findOne({ _id: ObjectId(_id) });
+    if (!findCourseToDelete) return { ok: false };
+    await client
+      .db("graphql")
+      .collection("courses")
+      .deleteOne({ _id: ObjectId(_id) });
+    return { _id, ok: true };
+  } catch (error) {
+    errorHandler("delteCourseError", error);
+  }
+};
+
+const deletePerson = async (_id) => {
+  try {
+    const client = await dbConnection();
+    const findStudentToDelete = await client
+      .db("graphql")
+      .collection("students")
+      .findOne({ _id: ObjectId(_id) });
+    if (!findStudentToDelete) return { ok: false };
+    await client
+      .db("graphql")
+      .collection("students")
+      .deleteOne({ _id: ObjectId(_id) });
+    return { _id, ok: true };
+  } catch (error) {
+    errorHandler("deleteStudentError", error);
+  }
+};
+
+const addPeople = async (courseID, personID) => {
+  try {
+    const client = await dbConnection();
+    const course = await client
+      .db("graphql")
+      .collection("courses")
+      .findOne({ _id: ObjectId(courseID) });
+    const student = await client
+      .db("graphql")
+      .collection("students")
+      .findOne({ _id: ObjectId(personID) });
+    if (course && student) {
+      await client
+        .db("graphql")
+        .collection("courses")
+        .updateOne(
+          { _id: ObjectId(courseID) },
+          { $addToSet: { people: ObjectId(personID) } }
+        );
+      const peopleAddinCourse = await client
+        .db("graphql")
+        .collection("courses")
+        .findOne({ _id: ObjectId(courseID) });
+      return peopleAddinCourse;
+    }
+    errorHandler("addPersonError", "courseID or personID does not exist");
+  } catch (error) {
+    errorHandler("addPersonError", error);
+  }
+};
+
+module.exports = {
+  createCourse,
+  createPerson,
+  editCourse,
+  editPerson,
+  deleteCourse,
+  deletePerson,
+  addPeople,
+};
