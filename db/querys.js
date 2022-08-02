@@ -52,4 +52,30 @@ const getpersonById = async (id) => {
   }
 };
 
-module.exports = { getCourses, getCourseById, getPeople, getpersonById };
+const searchItems = async (keyword) => {
+  try {
+    const client = await dbConnection();
+    const courses = await client
+      .db("graphql")
+      .collection("courses")
+      .find({ $text: { $search: keyword } })
+      .toArray();
+    const people = await client
+      .db("graphql")
+      .collection("students")
+      .find({ $text: { $search: keyword } })
+      .toArray();
+    const items = [...courses, ...people];
+    return items;
+  } catch (error) {
+    errorHandler("searchItemsError", error);
+  }
+};
+
+module.exports = {
+  getCourses,
+  getCourseById,
+  getPeople,
+  getpersonById,
+  searchItems,
+};
